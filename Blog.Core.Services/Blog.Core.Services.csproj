@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\netstandard2.0</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\netstandard2.0</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Blog.Core.Model\Blog.Core.Model.csproj" />
+    <ProjectReference Include="..\Blog.IServices\Blog.Core.IServices.csproj" />
+    <ProjectReference Include="..\Blog.Core.IRepository\Blog.Core.IRepository.csproj" />
+    <ProjectReference Include="..\Blog.Core.Repository\Blog.Core.Repository.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Base\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+  </ItemGroup>
+</Project>

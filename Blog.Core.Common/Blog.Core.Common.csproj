@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Class1.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
+      <HintPath>..\..\..\..\..\usr\local\share\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="MemoryCache\" />
+    <Folder Include="Helper\" />
+    <Folder Include="Attribute\" />
+    <Folder Include="DB\" />
+  </ItemGroup>
+</Project>
