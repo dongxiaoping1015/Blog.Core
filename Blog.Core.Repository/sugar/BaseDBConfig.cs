@@ -1,9 +1,11 @@
 ﻿using System;
+using Blog.Core.Common.DB;
+
 namespace Blog.Core.Repository
 {
     public class BaseDBConfig
     {
-        public static string ConnectionString = "server=localhost;userid=root;pwd=yesyes;port=3306;database=blog;";
+        public static string ConnectionString = "Server=localhost; Port=3306;Stmt=; Database=blog; Uid=root; Pwd=yesyes;";
 
     }
 }

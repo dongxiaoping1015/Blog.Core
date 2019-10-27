@@ -30,7 +30,7 @@ namespace Blog.Core.Repository.Base
         }
         public BaseRepository()
         {
-            DbContext.Init(BaseDBConfig.ConnectionString);
+            DbContext.Init(BaseDBConfig.ConnectionString, SqlSugar.DbType.MySql);
             context = DbContext.GetDbContext();
             db = context.Db;
             entityDB = context.GetEntityDB<TEntity>(db);

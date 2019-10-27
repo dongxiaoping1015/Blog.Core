@@ -23,6 +23,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Blog.Core
@@ -44,30 +46,50 @@ namespace Blog.Core
             // log日志注入
             // services.AddSingleton<ILoggerHelper, LogHelper>();
 
-            services.AddMvc()
-                .AddMvcOptions(o => o.EnableEndpointRouting = false)
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddControllers();
+                //.AddMvc()
+                //.AddMvcOptions(o => o.EnableEndpointRouting = false)
+                //.SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             #region 初始化DB
             services.AddScoped<Blog.Core.Model.DBSeed>();
             services.AddScoped<Blog.Core.Model.MyContext>();
             #endregion
 
+            #region CORS
+            //跨域第二种方法，声明策略，记得下边app中配置
+            services.AddCors(c =>
+            {
+                //一般采用这种方法
+                c.AddPolicy("LimitRequests", policy =>
+                {
+                    // 支持多个域名端口，注意端口号后不要带/斜杆：比如localhost:8000/，是错的
+                    // 注意，http://127.0.0.1:1818 和 http://localhost:1818 是不一样的，尽量写两个
+                    policy
+                    .WithOrigins("http://127.0.0.1:6688", "http://localhost:6688", "http://localhost:8021", "http://localhost:8081", "http://localhost:1818")
+                    .AllowAnyHeader()//Ensures that the policy allows any header.
+                    .AllowAnyMethod();
+                });
+            });
+
+            //跨域第一种办法，注意下边 Configure 中进行配置
+            //services.AddCors();
+            #endregion
+
             #region Swagger
             var basePath = Microsoft.DotNet.PlatformAbstractions.ApplicationEnvironment.ApplicationBasePath;
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info
+                c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v0.1.0",
                     Title = "Blog.Core API",
                     Description = "框架说明文档",
-                    TermsOfService = "None",
-                    Contact = new Swashbuckle.AspNetCore.Swagger.Contact
+                    Contact = new OpenApiContact
                     {
                         Name = "Blog.Core",
                         Email = "Blog.Core@xxx.com",
-                        Url = "https://www.jianshu.com/u/c965a074d484"
+                        Url = new Uri("https://www.jianshu.com/u/c965a074d484")
                     }
                 });
                 
@@ -77,14 +99,17 @@ namespace Blog.Core
                 c.IncludeXmlComments(xmlModelPath);
 
                 #region Token绑定到ConfigureServices
-                var security = new Dictionary<string, IEnumerable<string>> { { "Blog.Core", new string[] { } }, };
-                c.AddSecurityRequirement(security);
-                c.AddSecurityDefinition("Blog.Core", new ApiKeyScheme
+
+                c.OperationFilter<AddResponseHeadersFilter>();
+                c.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+                c.OperationFilter<SecurityRequirementsOperationFilter>();
+
+                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
                     Description = "JWT授权(数据将在请求头中进行传输) 直接在下框中输入Bearer {token}（注意两者之间是一个空格）\"",
                     Name = "Authorization", //jwt默认存放Authorization信息的位置(请求头中)
-                    In = "header",  //jwt默认存放Authorization信息的位置(请求头中)
-                    Type = "apiKey"
+                    In = ParameterLocation.Header,  //jwt默认存放Authorization信息的位置(请求头中)
+                    Type = SecuritySchemeType.ApiKey
                 });
                 #endregion
 
@@ -202,6 +227,21 @@ namespace Blog.Core
             });
             #endregion
 
+            app.UseRouting();
+
+            #region CORS
+            //跨域第二种方法，使用策略，详细策略信息在ConfigureService中
+            app.UseCors("LimitRequests");//将 CORS 中间件添加到 web 应用程序管线中, 以允许跨域请求。
+
+
+            #region 跨域第一种版本
+            //跨域第一种版本，请要ConfigureService中配置服务 services.AddCors();
+            //    app.UseCors(options => options.WithOrigins("http://localhost:8021").AllowAnyHeader()
+            //.AllowAnyMethod());  
+            #endregion
+
+            #endregion
+
             #region 开启认证中间件
 
             // 自定义认证中间件
@@ -213,7 +253,12 @@ namespace Blog.Core
             #endregion
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+            //app.UseMvc();
+            app.UseEndpoints(endpoints => {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }

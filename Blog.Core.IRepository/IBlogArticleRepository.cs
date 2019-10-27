@@ -7,6 +7,5 @@ namespace Blog.Core.IRepository
 {
     public interface IBlogArticleRepository : IBaseRepository<BlogArticle>
     {
-        Task<BlogArticle> GetBlogByID(int id);
     }
 }

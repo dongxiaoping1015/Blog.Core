@@ -36,7 +36,7 @@ namespace Blog.Core.Controllers
         [HttpGet("{id}")]
         public async Task<object> Get(int id)
         {
-            var blog = _blogArticleServices.getBlogByID(id);
+            var blog = _blogArticleServices.QueryByID(id);
             return Ok(new
             {
                 success = true,

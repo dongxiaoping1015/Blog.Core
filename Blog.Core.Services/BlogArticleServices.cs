@@ -18,12 +18,6 @@ namespace Blog.Core.Services
             base.baseDal = dal;
         }
 
-        public async Task<BlogArticle> getBlogByID(int id)
-        {
-            var blogArticle = (await dal.GetBlogByID(id));
-            return blogArticle;
-        }
-
         /// <summary>
         /// 获取博客列表
         /// </summary>
